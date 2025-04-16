@@ -20,32 +20,31 @@ namespace Coffe_Grinder
         {
             try
             {
-                // Load Coffee Inventory
-                CoffeeDataGrid.Visibility = Visibility.Collapsed;
-                CoffeeLoadingIndicator.Visibility = Visibility.Visible;
-
+                ToggleLoading(CoffeeDataGrid, CoffeeLoadingIndicator, true);
                 var coffeeInventory = await db.CoffeeInventories
                     .Include(c => c.CoffeeType)
                     .OrderBy(c => c.CoffeeName)
                     .ToListAsync();
-
                 CoffeeDataGrid.ItemsSource = coffeeInventory;
-                CoffeeLoadingIndicator.Visibility = Visibility.Collapsed;
-                CoffeeDataGrid.Visibility = Visibility.Visible;
+                ToggleLoading(CoffeeDataGrid, CoffeeLoadingIndicator, false);
 
                 // Load Recent Orders
-                OrdersDataGrid.Visibility = Visibility.Collapsed;
-                OrdersLoadingIndicator.Visibility = Visibility.Visible;
-
+                ToggleLoading(OrdersDataGrid, OrdersLoadingIndicator, true);
                 var recentOrders = await db.Orders
                     .Include(o => o.OrderStatus)
+                    .Include(o => o.User)
                     .OrderByDescending(o => o.OrderDate)
                     .Take(10)
                     .ToListAsync();
 
                 OrdersDataGrid.ItemsSource = recentOrders;
-                OrdersLoadingIndicator.Visibility = Visibility.Collapsed;
-                OrdersDataGrid.Visibility = Visibility.Visible;
+
+                if (!recentOrders.Any())
+                {
+                    MessageBox.Show("No recent orders found.", "Info",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                ToggleLoading(OrdersDataGrid, OrdersLoadingIndicator, false);
 
                 // Load Low Stock Alerts (under 10kg)
                 var lowStockItems = coffeeInventory
@@ -55,14 +54,13 @@ namespace Coffe_Grinder
 
                 if (!lowStockItems.Any())
                 {
-                    // Show message if no low stock items
                     LowStockList.ItemsSource = new[] {
-                        new {
-                            CoffeeName = "No low stock items",
-                            QuantityInStock = 0,
-                            CoffeeType = new { TypeName = "All items are sufficiently stocked" }
-                        }
-                    };
+                new {
+                    CoffeeName = "No low stock items",
+                    QuantityInStock = 0,
+                    CoffeeType = new { TypeName = "All items are sufficiently stocked" }
+                }
+            };
                 }
                 else
                 {
@@ -75,6 +73,12 @@ namespace Coffe_Grinder
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+        private void ToggleLoading(DataGrid dataGrid, FrameworkElement loader, bool isLoading)
+        {
+            dataGrid.Visibility = isLoading ? Visibility.Collapsed : Visibility.Visible;
+            loader.Visibility = isLoading ? Visibility.Visible : Visibility.Collapsed;
+        }
+
 
         private void ManageInventory_Click(object sender, RoutedEventArgs e)
         {

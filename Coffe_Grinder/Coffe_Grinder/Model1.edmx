@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="Coffe_Grinder_DBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="Coffe_Grinder_DBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Alerts">
           <Key>
             <PropertyRef Name="AlertID" />
@@ -99,11 +99,43 @@
           </Key>
           <Property Name="UserID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Username" Type="nvarchar" MaxLength="50" Nullable="false" />
-          <Property Name="Password" Type="nvarchar" MaxLength="64" />
+          <Property Name="Password" Type="nvarchar" MaxLength="64" Nullable="false" />
           <Property Name="Role" Type="nvarchar" MaxLength="10" Nullable="false" />
           <Property Name="PhoneNumber" Type="nvarchar" MaxLength="15" />
         </EntityType>
-        <Association Name="FK__Alerts__OrderID__6E2152BE">
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'Coffe_Grinder_DB.dbo.vw_CoffeeInventoryWithTypes' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="vw_CoffeeInventoryWithTypes">
+          <Key>
+            <PropertyRef Name="CoffeeID" />
+          </Key>
+          <Property Name="CoffeeID" Type="int" Nullable="false" />
+          <Property Name="CoffeeName" Type="nvarchar" MaxLength="100" />
+          <Property Name="TypeName" Type="varchar" MaxLength="100" />
+          <Property Name="QuantityInStock" Type="int" />
+          <Property Name="PricePerKg" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="Description" Type="nvarchar(max)" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'Coffe_Grinder_DB.dbo.vw_OrderDetailsExtended' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="vw_OrderDetailsExtended">
+          <Key>
+            <PropertyRef Name="OrderDetailID" />
+            <PropertyRef Name="OrderID" />
+            <PropertyRef Name="StatusName" />
+          </Key>
+          <Property Name="OrderDetailID" Type="int" Nullable="false" />
+          <Property Name="OrderID" Type="int" Nullable="false" />
+          <Property Name="OrderDate" Type="datetime" />
+          <Property Name="CustomerName" Type="varchar" MaxLength="100" />
+          <Property Name="StatusName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="CoffeeName" Type="nvarchar" MaxLength="100" />
+          <Property Name="CoffeeType" Type="varchar" MaxLength="100" />
+          <Property Name="Quantity" Type="int" />
+          <Property Name="UnitPrice" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="LineTotal" Type="decimal" Precision="21" Scale="2" />
+        </EntityType>
+        <Association Name="FK__Alerts__OrderID__2AE0483B">
           <End Role="Orders" Type="Self.Orders" Multiplicity="0..1" />
           <End Role="Alerts" Type="Self.Alerts" Multiplicity="*" />
           <ReferentialConstraint>
@@ -115,7 +147,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__AuditLogs__UserI__75C27486">
+        <Association Name="FK__AuditLogs__UserI__32816A03">
           <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
           <End Role="AuditLogs" Type="Self.AuditLogs" Multiplicity="*" />
           <ReferentialConstraint>
@@ -127,7 +159,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__CoffeeInv__Coffe__5DEAEAF5">
+        <Association Name="FK__CoffeeInv__Coffe__1AA9E072">
           <End Role="CoffeeTypes" Type="Self.CoffeeTypes" Multiplicity="0..1" />
           <End Role="CoffeeInventory" Type="Self.CoffeeInventory" Multiplicity="*" />
           <ReferentialConstraint>
@@ -139,8 +171,10 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__OrderDeta__Coffe__695C9DA1">
-          <End Role="CoffeeInventory" Type="Self.CoffeeInventory" Multiplicity="0..1" />
+        <Association Name="FK__OrderDeta__Coffe__261B931E">
+          <End Role="CoffeeInventory" Type="Self.CoffeeInventory" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="OrderDetails" Type="Self.OrderDetails" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="CoffeeInventory">
@@ -151,7 +185,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__OrderDeta__Order__68687968">
+        <Association Name="FK__OrderDeta__Order__25276EE5">
           <End Role="Orders" Type="Self.Orders" Multiplicity="0..1" />
           <End Role="OrderDetails" Type="Self.OrderDetails" Multiplicity="*" />
           <ReferentialConstraint>
@@ -163,7 +197,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Orders__StatusID__63A3C44B">
+        <Association Name="FK__Orders__StatusID__2062B9C8">
           <End Role="OrderStatuses" Type="Self.OrderStatuses" Multiplicity="0..1" />
           <End Role="Orders" Type="Self.Orders" Multiplicity="*" />
           <ReferentialConstraint>
@@ -175,7 +209,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Orders__UserID__62AFA012">
+        <Association Name="FK__Orders__UserID__1F6E958F">
           <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
           <End Role="Orders" Type="Self.Orders" Multiplicity="*" />
           <ReferentialConstraint>
@@ -187,7 +221,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__UserLogin__UserI__71F1E3A2">
+        <Association Name="FK__UserLogin__UserI__2EB0D91F">
           <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
           <End Role="UserLogins" Type="Self.UserLogins" Multiplicity="*" />
           <ReferentialConstraint>
@@ -199,6 +233,37 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Function Name="fn_diagramobjects" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="int" />
+        <Function Name="sp_alterdiagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+          <Parameter Name="version" Type="int" Mode="In" />
+          <Parameter Name="definition" Type="varbinary(max)" Mode="In" />
+        </Function>
+        <Function Name="sp_creatediagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+          <Parameter Name="version" Type="int" Mode="In" />
+          <Parameter Name="definition" Type="varbinary(max)" Mode="In" />
+        </Function>
+        <Function Name="sp_dropdiagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+        </Function>
+        <Function Name="sp_helpdiagramdefinition" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+        </Function>
+        <Function Name="sp_helpdiagrams" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+        </Function>
+        <Function Name="sp_renamediagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+          <Parameter Name="new_diagramname" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="sp_upgraddiagrams" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <EntityContainer Name="Coffe_Grinder_DBModelStoreContainer">
           <EntitySet Name="Alerts" EntityType="Self.Alerts" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AuditLogs" EntityType="Self.AuditLogs" Schema="dbo" store:Type="Tables" />
@@ -210,40 +275,65 @@
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="UserLogins" EntityType="Self.UserLogins" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
-          <AssociationSet Name="FK__Alerts__OrderID__6E2152BE" Association="Self.FK__Alerts__OrderID__6E2152BE">
+          <EntitySet Name="vw_CoffeeInventoryWithTypes" EntityType="Self.vw_CoffeeInventoryWithTypes" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vw_CoffeeInventoryWithTypes].[CoffeeID] AS [CoffeeID], 
+    [vw_CoffeeInventoryWithTypes].[CoffeeName] AS [CoffeeName], 
+    [vw_CoffeeInventoryWithTypes].[TypeName] AS [TypeName], 
+    [vw_CoffeeInventoryWithTypes].[QuantityInStock] AS [QuantityInStock], 
+    [vw_CoffeeInventoryWithTypes].[PricePerKg] AS [PricePerKg], 
+    [vw_CoffeeInventoryWithTypes].[Description] AS [Description]
+    FROM [dbo].[vw_CoffeeInventoryWithTypes] AS [vw_CoffeeInventoryWithTypes]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vw_OrderDetailsExtended" EntityType="Self.vw_OrderDetailsExtended" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vw_OrderDetailsExtended].[OrderDetailID] AS [OrderDetailID], 
+    [vw_OrderDetailsExtended].[OrderID] AS [OrderID], 
+    [vw_OrderDetailsExtended].[OrderDate] AS [OrderDate], 
+    [vw_OrderDetailsExtended].[CustomerName] AS [CustomerName], 
+    [vw_OrderDetailsExtended].[StatusName] AS [StatusName], 
+    [vw_OrderDetailsExtended].[CoffeeName] AS [CoffeeName], 
+    [vw_OrderDetailsExtended].[CoffeeType] AS [CoffeeType], 
+    [vw_OrderDetailsExtended].[Quantity] AS [Quantity], 
+    [vw_OrderDetailsExtended].[UnitPrice] AS [UnitPrice], 
+    [vw_OrderDetailsExtended].[LineTotal] AS [LineTotal]
+    FROM [dbo].[vw_OrderDetailsExtended] AS [vw_OrderDetailsExtended]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK__Alerts__OrderID__2AE0483B" Association="Self.FK__Alerts__OrderID__2AE0483B">
             <End Role="Orders" EntitySet="Orders" />
             <End Role="Alerts" EntitySet="Alerts" />
           </AssociationSet>
-          <AssociationSet Name="FK__AuditLogs__UserI__75C27486" Association="Self.FK__AuditLogs__UserI__75C27486">
+          <AssociationSet Name="FK__AuditLogs__UserI__32816A03" Association="Self.FK__AuditLogs__UserI__32816A03">
             <End Role="Users" EntitySet="Users" />
             <End Role="AuditLogs" EntitySet="AuditLogs" />
           </AssociationSet>
-          <AssociationSet Name="FK__CoffeeInv__Coffe__5DEAEAF5" Association="Self.FK__CoffeeInv__Coffe__5DEAEAF5">
+          <AssociationSet Name="FK__CoffeeInv__Coffe__1AA9E072" Association="Self.FK__CoffeeInv__Coffe__1AA9E072">
             <End Role="CoffeeTypes" EntitySet="CoffeeTypes" />
             <End Role="CoffeeInventory" EntitySet="CoffeeInventory" />
           </AssociationSet>
-          <AssociationSet Name="FK__OrderDeta__Coffe__695C9DA1" Association="Self.FK__OrderDeta__Coffe__695C9DA1">
+          <AssociationSet Name="FK__OrderDeta__Coffe__261B931E" Association="Self.FK__OrderDeta__Coffe__261B931E">
             <End Role="CoffeeInventory" EntitySet="CoffeeInventory" />
             <End Role="OrderDetails" EntitySet="OrderDetails" />
           </AssociationSet>
-          <AssociationSet Name="FK__OrderDeta__Order__68687968" Association="Self.FK__OrderDeta__Order__68687968">
+          <AssociationSet Name="FK__OrderDeta__Order__25276EE5" Association="Self.FK__OrderDeta__Order__25276EE5">
             <End Role="Orders" EntitySet="Orders" />
             <End Role="OrderDetails" EntitySet="OrderDetails" />
           </AssociationSet>
-          <AssociationSet Name="FK__Orders__StatusID__63A3C44B" Association="Self.FK__Orders__StatusID__63A3C44B">
+          <AssociationSet Name="FK__Orders__StatusID__2062B9C8" Association="Self.FK__Orders__StatusID__2062B9C8">
             <End Role="OrderStatuses" EntitySet="OrderStatuses" />
             <End Role="Orders" EntitySet="Orders" />
           </AssociationSet>
-          <AssociationSet Name="FK__Orders__UserID__62AFA012" Association="Self.FK__Orders__UserID__62AFA012">
+          <AssociationSet Name="FK__Orders__UserID__1F6E958F" Association="Self.FK__Orders__UserID__1F6E958F">
             <End Role="Users" EntitySet="Users" />
             <End Role="Orders" EntitySet="Orders" />
           </AssociationSet>
-          <AssociationSet Name="FK__UserLogin__UserI__71F1E3A2" Association="Self.FK__UserLogin__UserI__71F1E3A2">
+          <AssociationSet Name="FK__UserLogin__UserI__2EB0D91F" Association="Self.FK__UserLogin__UserI__2EB0D91F">
             <End Role="Users" EntitySet="Users" />
             <End Role="UserLogins" EntitySet="UserLogins" />
           </AssociationSet>
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="Coffe_Grinder_DBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -256,7 +346,7 @@
           <Property Name="CreatedAt" Type="DateTime" Precision="3" />
           <Property Name="IsRead" Type="Boolean" />
           <Property Name="OrderID" Type="Int32" />
-          <NavigationProperty Name="Order" Relationship="Self.FK__Alerts__OrderID__451F3D2B" FromRole="Alerts" ToRole="Orders" />
+          <NavigationProperty Name="Order" Relationship="Self.FK__Alerts__OrderID__2AE0483B" FromRole="Alerts" ToRole="Orders" />
         </EntityType>
         <EntityType Name="AuditLog">
           <Key>
@@ -268,7 +358,7 @@
           <Property Name="UserID" Type="Int32" />
           <Property Name="Timestamp" Type="DateTime" Precision="3" />
           <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="User" Relationship="Self.FK__AuditLogs__UserI__4CC05EF3" FromRole="AuditLogs" ToRole="Users" />
+          <NavigationProperty Name="User" Relationship="Self.FK__AuditLogs__UserI__32816A03" FromRole="AuditLogs" ToRole="Users" />
         </EntityType>
         <EntityType Name="CoffeeInventory">
           <Key>
@@ -280,8 +370,8 @@
           <Property Name="PricePerKg" Type="Decimal" Precision="10" Scale="2" />
           <Property Name="CoffeeName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="CoffeeType" Relationship="Self.FK__CoffeeInv__Coffe__34E8D562" FromRole="CoffeeInventory" ToRole="CoffeeTypes" />
-          <NavigationProperty Name="OrderDetails" Relationship="Self.FK__OrderDeta__Coffe__405A880E" FromRole="CoffeeInventory" ToRole="OrderDetails" />
+          <NavigationProperty Name="CoffeeType" Relationship="Self.FK__CoffeeInv__Coffe__1AA9E072" FromRole="CoffeeInventory" ToRole="CoffeeTypes" />
+          <NavigationProperty Name="OrderDetails" Relationship="Self.FK__OrderDeta__Coffe__261B931E" FromRole="CoffeeInventory" ToRole="OrderDetails" />
         </EntityType>
         <EntityType Name="CoffeeType">
           <Key>
@@ -289,7 +379,7 @@
           </Key>
           <Property Name="CoffeeTypeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="TypeName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="CoffeeInventories" Relationship="Self.FK__CoffeeInv__Coffe__34E8D562" FromRole="CoffeeTypes" ToRole="CoffeeInventory" />
+          <NavigationProperty Name="CoffeeInventories" Relationship="Self.FK__CoffeeInv__Coffe__1AA9E072" FromRole="CoffeeTypes" ToRole="CoffeeInventory" />
         </EntityType>
         <EntityType Name="OrderDetail">
           <Key>
@@ -300,8 +390,8 @@
           <Property Name="CoffeeID" Type="Int32" />
           <Property Name="Quantity" Type="Int32" />
           <Property Name="UnitPrice" Type="Decimal" Precision="10" Scale="2" />
-          <NavigationProperty Name="CoffeeInventory" Relationship="Self.FK__OrderDeta__Coffe__405A880E" FromRole="OrderDetails" ToRole="CoffeeInventory" />
-          <NavigationProperty Name="Order" Relationship="Self.FK__OrderDeta__Order__3F6663D5" FromRole="OrderDetails" ToRole="Orders" />
+          <NavigationProperty Name="CoffeeInventory" Relationship="Self.FK__OrderDeta__Coffe__261B931E" FromRole="OrderDetails" ToRole="CoffeeInventory" />
+          <NavigationProperty Name="Order" Relationship="Self.FK__OrderDeta__Order__25276EE5" FromRole="OrderDetails" ToRole="Orders" />
         </EntityType>
         <EntityType Name="Order">
           <Key>
@@ -313,12 +403,12 @@
           <Property Name="CustomerName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="TotalPrice" Type="Decimal" Precision="10" Scale="2" />
           <Property Name="UserID" Type="Int32" />
-          <NavigationProperty Name="Alerts" Relationship="Self.FK__Alerts__OrderID__451F3D2B" FromRole="Orders" ToRole="Alerts" />
-          <NavigationProperty Name="OrderDetails" Relationship="Self.FK__OrderDeta__Order__3F6663D5" FromRole="Orders" ToRole="OrderDetails" />
-          <NavigationProperty Name="OrderStatus" Relationship="Self.FK__Orders__StatusID__3AA1AEB8" FromRole="Orders" ToRole="OrderStatuses" />
-          <NavigationProperty Name="User" Relationship="Self.FK__Orders__UserID__39AD8A7F" FromRole="Orders" ToRole="Users" />
           <Property Name="PhoneNumber" Type="String" MaxLength="15" FixedLength="false" Unicode="true" />
           <Property Name="Notes" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Alerts" Relationship="Self.FK__Alerts__OrderID__2AE0483B" FromRole="Orders" ToRole="Alerts" />
+          <NavigationProperty Name="OrderDetails" Relationship="Self.FK__OrderDeta__Order__25276EE5" FromRole="Orders" ToRole="OrderDetails" />
+          <NavigationProperty Name="OrderStatus" Relationship="Self.FK__Orders__StatusID__2062B9C8" FromRole="Orders" ToRole="OrderStatuses" />
+          <NavigationProperty Name="User" Relationship="Self.FK__Orders__UserID__1F6E958F" FromRole="Orders" ToRole="Users" />
         </EntityType>
         <EntityType Name="OrderStatus">
           <Key>
@@ -326,7 +416,7 @@
           </Key>
           <Property Name="StatusID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="StatusName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="Orders" Relationship="Self.FK__Orders__StatusID__3AA1AEB8" FromRole="OrderStatuses" ToRole="Orders" />
+          <NavigationProperty Name="Orders" Relationship="Self.FK__Orders__StatusID__2062B9C8" FromRole="OrderStatuses" ToRole="Orders" />
         </EntityType>
         <EntityType Name="sysdiagram">
           <Key>
@@ -346,7 +436,7 @@
           <Property Name="UserID" Type="Int32" />
           <Property Name="LoginTime" Type="DateTime" Precision="3" />
           <Property Name="IPAddress" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="User" Relationship="Self.FK__UserLogin__UserI__48EFCE0F" FromRole="UserLogins" ToRole="Users" />
+          <NavigationProperty Name="User" Relationship="Self.FK__UserLogin__UserI__2EB0D91F" FromRole="UserLogins" ToRole="Users" />
         </EntityType>
         <EntityType Name="User">
           <Key>
@@ -354,14 +444,42 @@
           </Key>
           <Property Name="UserID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Username" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Password" Type="String" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Name="Password" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Role" Type="String" MaxLength="10" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="PhoneNumber" Type="String" MaxLength="15" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="AuditLogs" Relationship="Self.FK__AuditLogs__UserI__4CC05EF3" FromRole="Users" ToRole="AuditLogs" />
-          <NavigationProperty Name="Orders" Relationship="Self.FK__Orders__UserID__39AD8A7F" FromRole="Users" ToRole="Orders" />
-          <NavigationProperty Name="UserLogins" Relationship="Self.FK__UserLogin__UserI__48EFCE0F" FromRole="Users" ToRole="UserLogins" />
+          <NavigationProperty Name="AuditLogs" Relationship="Self.FK__AuditLogs__UserI__32816A03" FromRole="Users" ToRole="AuditLogs" />
+          <NavigationProperty Name="Orders" Relationship="Self.FK__Orders__UserID__1F6E958F" FromRole="Users" ToRole="Orders" />
+          <NavigationProperty Name="UserLogins" Relationship="Self.FK__UserLogin__UserI__2EB0D91F" FromRole="Users" ToRole="UserLogins" />
         </EntityType>
-        <Association Name="FK__Alerts__OrderID__451F3D2B">
+        <EntityType Name="vw_CoffeeInventoryWithTypes">
+          <Key>
+            <PropertyRef Name="CoffeeID" />
+          </Key>
+          <Property Name="CoffeeID" Type="Int32" Nullable="false" />
+          <Property Name="CoffeeName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="TypeName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="QuantityInStock" Type="Int32" />
+          <Property Name="PricePerKg" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="vw_OrderDetailsExtended">
+          <Key>
+            <PropertyRef Name="OrderDetailID" />
+            <PropertyRef Name="OrderID" />
+            <PropertyRef Name="StatusName" />
+          </Key>
+          <Property Name="OrderDetailID" Type="Int32" Nullable="false" />
+          <Property Name="OrderID" Type="Int32" Nullable="false" />
+          <Property Name="OrderDate" Type="DateTime" Precision="3" />
+          <Property Name="CustomerName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="StatusName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="CoffeeName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="CoffeeType" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Quantity" Type="Int32" />
+          <Property Name="UnitPrice" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="LineTotal" Type="Decimal" Precision="21" Scale="2" />
+        </EntityType>
+        <Association Name="FK__Alerts__OrderID__2AE0483B">
           <End Role="Orders" Type="Self.Order" Multiplicity="0..1" />
           <End Role="Alerts" Type="Self.Alert" Multiplicity="*" />
           <ReferentialConstraint>
@@ -373,7 +491,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__AuditLogs__UserI__4CC05EF3">
+        <Association Name="FK__AuditLogs__UserI__32816A03">
           <End Role="Users" Type="Self.User" Multiplicity="0..1" />
           <End Role="AuditLogs" Type="Self.AuditLog" Multiplicity="*" />
           <ReferentialConstraint>
@@ -385,7 +503,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__CoffeeInv__Coffe__34E8D562">
+        <Association Name="FK__CoffeeInv__Coffe__1AA9E072">
           <End Role="CoffeeTypes" Type="Self.CoffeeType" Multiplicity="0..1" />
           <End Role="CoffeeInventory" Type="Self.CoffeeInventory" Multiplicity="*" />
           <ReferentialConstraint>
@@ -397,8 +515,10 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__OrderDeta__Coffe__405A880E">
-          <End Role="CoffeeInventory" Type="Self.CoffeeInventory" Multiplicity="0..1" />
+        <Association Name="FK__OrderDeta__Coffe__261B931E">
+          <End Role="CoffeeInventory" Type="Self.CoffeeInventory" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="OrderDetails" Type="Self.OrderDetail" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="CoffeeInventory">
@@ -409,7 +529,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__OrderDeta__Order__3F6663D5">
+        <Association Name="FK__OrderDeta__Order__25276EE5">
           <End Role="Orders" Type="Self.Order" Multiplicity="0..1" />
           <End Role="OrderDetails" Type="Self.OrderDetail" Multiplicity="*" />
           <ReferentialConstraint>
@@ -421,7 +541,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Orders__StatusID__3AA1AEB8">
+        <Association Name="FK__Orders__StatusID__2062B9C8">
           <End Role="OrderStatuses" Type="Self.OrderStatus" Multiplicity="0..1" />
           <End Role="Orders" Type="Self.Order" Multiplicity="*" />
           <ReferentialConstraint>
@@ -433,7 +553,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Orders__UserID__39AD8A7F">
+        <Association Name="FK__Orders__UserID__1F6E958F">
           <End Role="Users" Type="Self.User" Multiplicity="0..1" />
           <End Role="Orders" Type="Self.Order" Multiplicity="*" />
           <ReferentialConstraint>
@@ -445,7 +565,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__UserLogin__UserI__48EFCE0F">
+        <Association Name="FK__UserLogin__UserI__2EB0D91F">
           <End Role="Users" Type="Self.User" Multiplicity="0..1" />
           <End Role="UserLogins" Type="Self.UserLogin" Multiplicity="*" />
           <ReferentialConstraint>
@@ -468,39 +588,82 @@
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagram" />
           <EntitySet Name="UserLogins" EntityType="Self.UserLogin" />
           <EntitySet Name="Users" EntityType="Self.User" />
-          <AssociationSet Name="FK__Alerts__OrderID__451F3D2B" Association="Self.FK__Alerts__OrderID__451F3D2B">
+          <EntitySet Name="vw_CoffeeInventoryWithTypes" EntityType="Self.vw_CoffeeInventoryWithTypes" />
+          <EntitySet Name="vw_OrderDetailsExtended" EntityType="Self.vw_OrderDetailsExtended" />
+          <AssociationSet Name="FK__Alerts__OrderID__2AE0483B" Association="Self.FK__Alerts__OrderID__2AE0483B">
             <End Role="Orders" EntitySet="Orders" />
             <End Role="Alerts" EntitySet="Alerts" />
           </AssociationSet>
-          <AssociationSet Name="FK__AuditLogs__UserI__4CC05EF3" Association="Self.FK__AuditLogs__UserI__4CC05EF3">
+          <AssociationSet Name="FK__AuditLogs__UserI__32816A03" Association="Self.FK__AuditLogs__UserI__32816A03">
             <End Role="Users" EntitySet="Users" />
             <End Role="AuditLogs" EntitySet="AuditLogs" />
           </AssociationSet>
-          <AssociationSet Name="FK__CoffeeInv__Coffe__34E8D562" Association="Self.FK__CoffeeInv__Coffe__34E8D562">
+          <AssociationSet Name="FK__CoffeeInv__Coffe__1AA9E072" Association="Self.FK__CoffeeInv__Coffe__1AA9E072">
             <End Role="CoffeeTypes" EntitySet="CoffeeTypes" />
             <End Role="CoffeeInventory" EntitySet="CoffeeInventories" />
           </AssociationSet>
-          <AssociationSet Name="FK__OrderDeta__Coffe__405A880E" Association="Self.FK__OrderDeta__Coffe__405A880E">
+          <AssociationSet Name="FK__OrderDeta__Coffe__261B931E" Association="Self.FK__OrderDeta__Coffe__261B931E">
             <End Role="CoffeeInventory" EntitySet="CoffeeInventories" />
             <End Role="OrderDetails" EntitySet="OrderDetails" />
           </AssociationSet>
-          <AssociationSet Name="FK__OrderDeta__Order__3F6663D5" Association="Self.FK__OrderDeta__Order__3F6663D5">
+          <AssociationSet Name="FK__OrderDeta__Order__25276EE5" Association="Self.FK__OrderDeta__Order__25276EE5">
             <End Role="Orders" EntitySet="Orders" />
             <End Role="OrderDetails" EntitySet="OrderDetails" />
           </AssociationSet>
-          <AssociationSet Name="FK__Orders__StatusID__3AA1AEB8" Association="Self.FK__Orders__StatusID__3AA1AEB8">
+          <AssociationSet Name="FK__Orders__StatusID__2062B9C8" Association="Self.FK__Orders__StatusID__2062B9C8">
             <End Role="OrderStatuses" EntitySet="OrderStatuses" />
             <End Role="Orders" EntitySet="Orders" />
           </AssociationSet>
-          <AssociationSet Name="FK__Orders__UserID__39AD8A7F" Association="Self.FK__Orders__UserID__39AD8A7F">
+          <AssociationSet Name="FK__Orders__UserID__1F6E958F" Association="Self.FK__Orders__UserID__1F6E958F">
             <End Role="Users" EntitySet="Users" />
             <End Role="Orders" EntitySet="Orders" />
           </AssociationSet>
-          <AssociationSet Name="FK__UserLogin__UserI__48EFCE0F" Association="Self.FK__UserLogin__UserI__48EFCE0F">
+          <AssociationSet Name="FK__UserLogin__UserI__2EB0D91F" Association="Self.FK__UserLogin__UserI__2EB0D91F">
             <End Role="Users" EntitySet="Users" />
             <End Role="UserLogins" EntitySet="UserLogins" />
           </AssociationSet>
+          <FunctionImport Name="sp_alterdiagram">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+            <Parameter Name="version" Mode="In" Type="Int32" />
+            <Parameter Name="definition" Mode="In" Type="Binary" />
+          </FunctionImport>
+          <FunctionImport Name="sp_creatediagram">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+            <Parameter Name="version" Mode="In" Type="Int32" />
+            <Parameter Name="definition" Mode="In" Type="Binary" />
+          </FunctionImport>
+          <FunctionImport Name="sp_dropdiagram">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="sp_helpdiagramdefinition" ReturnType="Collection(Coffe_Grinder_DBModel.sp_helpdiagramdefinition_Result)">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="sp_helpdiagrams" ReturnType="Collection(Coffe_Grinder_DBModel.sp_helpdiagrams_Result)">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="sp_renamediagram">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+            <Parameter Name="new_diagramname" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="sp_upgraddiagrams" />
         </EntityContainer>
+        <ComplexType Name="sp_helpdiagramdefinition_Result">
+          <Property Type="Int32" Name="version" Nullable="true" />
+          <Property Type="Binary" Name="definition" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="sp_helpdiagrams_Result">
+          <Property Type="String" Name="Database" Nullable="true" MaxLength="128" />
+          <Property Type="String" Name="Name" Nullable="false" MaxLength="128" />
+          <Property Type="Int32" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Owner" Nullable="true" MaxLength="128" />
+          <Property Type="Int32" Name="OwnerID" Nullable="false" />
+        </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -564,14 +727,14 @@
           <EntitySetMapping Name="Orders">
             <EntityTypeMapping TypeName="Coffe_Grinder_DBModel.Order">
               <MappingFragment StoreEntitySet="Orders">
-                <ScalarProperty Name="Notes" ColumnName="Notes" />
-                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
                 <ScalarProperty Name="OrderID" ColumnName="OrderID" />
                 <ScalarProperty Name="OrderDate" ColumnName="OrderDate" />
                 <ScalarProperty Name="StatusID" ColumnName="StatusID" />
                 <ScalarProperty Name="CustomerName" ColumnName="CustomerName" />
                 <ScalarProperty Name="TotalPrice" ColumnName="TotalPrice" />
                 <ScalarProperty Name="UserID" ColumnName="UserID" />
+                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
+                <ScalarProperty Name="Notes" ColumnName="Notes" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -615,6 +778,58 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="vw_CoffeeInventoryWithTypes">
+            <EntityTypeMapping TypeName="Coffe_Grinder_DBModel.vw_CoffeeInventoryWithTypes">
+              <MappingFragment StoreEntitySet="vw_CoffeeInventoryWithTypes">
+                <ScalarProperty Name="CoffeeID" ColumnName="CoffeeID" />
+                <ScalarProperty Name="CoffeeName" ColumnName="CoffeeName" />
+                <ScalarProperty Name="TypeName" ColumnName="TypeName" />
+                <ScalarProperty Name="QuantityInStock" ColumnName="QuantityInStock" />
+                <ScalarProperty Name="PricePerKg" ColumnName="PricePerKg" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vw_OrderDetailsExtended">
+            <EntityTypeMapping TypeName="Coffe_Grinder_DBModel.vw_OrderDetailsExtended">
+              <MappingFragment StoreEntitySet="vw_OrderDetailsExtended">
+                <ScalarProperty Name="OrderDetailID" ColumnName="OrderDetailID" />
+                <ScalarProperty Name="OrderID" ColumnName="OrderID" />
+                <ScalarProperty Name="OrderDate" ColumnName="OrderDate" />
+                <ScalarProperty Name="CustomerName" ColumnName="CustomerName" />
+                <ScalarProperty Name="StatusName" ColumnName="StatusName" />
+                <ScalarProperty Name="CoffeeName" ColumnName="CoffeeName" />
+                <ScalarProperty Name="CoffeeType" ColumnName="CoffeeType" />
+                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+                <ScalarProperty Name="UnitPrice" ColumnName="UnitPrice" />
+                <ScalarProperty Name="LineTotal" ColumnName="LineTotal" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="sp_alterdiagram" FunctionName="Coffe_Grinder_DBModel.Store.sp_alterdiagram" />
+          <FunctionImportMapping FunctionImportName="sp_creatediagram" FunctionName="Coffe_Grinder_DBModel.Store.sp_creatediagram" />
+          <FunctionImportMapping FunctionImportName="sp_dropdiagram" FunctionName="Coffe_Grinder_DBModel.Store.sp_dropdiagram" />
+          <FunctionImportMapping FunctionImportName="sp_helpdiagramdefinition" FunctionName="Coffe_Grinder_DBModel.Store.sp_helpdiagramdefinition">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="Coffe_Grinder_DBModel.sp_helpdiagramdefinition_Result">
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="definition" ColumnName="definition" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="sp_helpdiagrams" FunctionName="Coffe_Grinder_DBModel.Store.sp_helpdiagrams">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="Coffe_Grinder_DBModel.sp_helpdiagrams_Result">
+                <ScalarProperty Name="Database" ColumnName="Database" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Owner" ColumnName="Owner" />
+                <ScalarProperty Name="OwnerID" ColumnName="OwnerID" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="sp_renamediagram" FunctionName="Coffe_Grinder_DBModel.Store.sp_renamediagram" />
+          <FunctionImportMapping FunctionImportName="sp_upgraddiagrams" FunctionName="Coffe_Grinder_DBModel.Store.sp_upgraddiagrams" />
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

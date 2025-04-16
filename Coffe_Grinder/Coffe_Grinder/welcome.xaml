@@ -91,7 +91,7 @@
 
         <!-- Footer -->
         <TextBlock Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2"
-                   Text="© 2023 Coffee Grinder. All rights reserved."
+                   Text="© 2025 Coffee Grinder. All rights reserved."
                    Foreground="BurlyWood"
                    FontSize="12"
                    HorizontalAlignment="Center"

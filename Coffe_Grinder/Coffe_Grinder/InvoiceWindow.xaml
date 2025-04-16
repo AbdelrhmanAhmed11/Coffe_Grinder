@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Coffe_Grinder"
         Title="Invoice" Height="500" Width="400"
+        Icon ="Coffe_Grinder.ico"
         WindowStartupLocation="CenterScreen">
 
     <Window.Resources>

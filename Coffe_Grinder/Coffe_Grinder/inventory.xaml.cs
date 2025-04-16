@@ -36,12 +36,8 @@ namespace Coffe_Grinder
                 db.CoffeeTypes.Add(newCoffeeType);
                 db.SaveChanges();
 
-                // Refresh the coffee types dropdown
                 LoadCoffeeTypes();
-
-                // Clear the input fields
                 NewCoffeeTypeName.Text = string.Empty;
-
                 ShowSuccessMessage("New coffee type added successfully!");
             }
             catch (Exception ex)
@@ -76,7 +72,6 @@ namespace Coffe_Grinder
                     return;
                 }
 
-                // Populate the form
                 Id.Text = inventoryItem.CoffeeID.ToString();
                 CoffeeName.Text = inventoryItem.CoffeeName;
                 CoffeeType.SelectedValue = inventoryItem.CoffeeTypeID;
@@ -84,7 +79,6 @@ namespace Coffe_Grinder
                 Amount.Text = inventoryItem.QuantityInStock.ToString();
                 PricePerKg.Text = inventoryItem.PricePerKg.ToString();
 
-                // Highlight the row in DataGrid
                 CoffeeDataGrid.SelectedItem = inventoryItem;
                 CoffeeDataGrid.ScrollIntoView(inventoryItem);
 
@@ -213,7 +207,7 @@ namespace Coffe_Grinder
                 return;
             }
 
-            var result = MessageBox.Show("Are you sure you want to delete this coffee?",
+            var result = MessageBox.Show("Are you sure you want to delete this coffee? This will also delete all related order details.",
                 "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
             if (result != MessageBoxResult.Yes) return;
@@ -221,8 +215,16 @@ namespace Coffe_Grinder
             try
             {
                 int coffeeId = int.Parse(Id.Text);
-                var inventory = db.CoffeeInventories.Find(coffeeId);
 
+                // First delete any related order details
+                var relatedOrderDetails = db.OrderDetails.Where(od => od.CoffeeID == coffeeId).ToList();
+                if (relatedOrderDetails.Any())
+                {
+                    db.OrderDetails.RemoveRange(relatedOrderDetails);
+                }
+
+                // Then delete the coffee inventory item
+                var inventory = db.CoffeeInventories.FirstOrDefault(x => x.CoffeeID == coffeeId);
                 if (inventory == null)
                 {
                     ShowErrorMessage("Selected coffee not found in database.");
@@ -231,13 +233,18 @@ namespace Coffe_Grinder
 
                 db.CoffeeInventories.Remove(inventory);
                 db.SaveChanges();
+
+                // Reseed the identity column to fill gaps
+                var maxId = db.CoffeeInventories.Any() ? db.CoffeeInventories.Max(c => c.CoffeeID) : 0;
+                db.Database.ExecuteSqlCommand($"DBCC CHECKIDENT ('CoffeeInventory', RESEED, {maxId})");
+
                 LoadCoffeeInventory();
                 ClearForm();
-                ShowSuccessMessage("Coffee deleted successfully.");
+                ShowSuccessMessage("Coffee deleted successfully. ID sequence has been reorganized.");
             }
             catch (Exception ex)
             {
-                ShowErrorMessage($"Error deleting coffee: {ex.Message}");
+                ShowErrorMessage($"Error deleting coffee: {ex.Message}\n\nMake sure there are no orders referencing this coffee item.");
             }
         }
 

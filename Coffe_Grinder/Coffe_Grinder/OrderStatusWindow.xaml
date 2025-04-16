@@ -1,6 +1,7 @@
 ﻿<Window x:Class="Coffe_Grinder.OrderStatusWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Icon ="Coffe_Grinder.ico"
         Title="Update Order Status" Height="200" Width="300">
     <Grid Margin="10">
         <Grid.RowDefinitions>
